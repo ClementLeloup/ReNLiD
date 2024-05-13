@@ -12,10 +12,11 @@ vpath %.o build
 vpath .base build
 
 # C compiler:
-CC       = gcc
+#CC       = gcc -std=c++17
+CC	 = mpic++ -std=c++17
 
 # Additional libraries
-LBFLAG = -lstdc++ -lm
+LBFLAG = -lstdc++ --lfftw3 -lm
 
 # where to find include files *.h
 INCLUDES = -I../include
@@ -25,7 +26,7 @@ HEADERFILES = $(wildcard ./include/*.h)
 	cd $(WRKDIR);$(CC) $(LBFLAG) $(INCLUDES) -c ../$< -o $*.o
 
 
-SOURCE = field.o scalar.o vector.o lie.o group.o
+SOURCE = field.o scalar.o vector.o lie.o group.o lattice.o
 
 MAIN = ReNLiD.o
 

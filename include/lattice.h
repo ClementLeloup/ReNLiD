@@ -5,6 +5,7 @@
 
 #include "precisions.h"
 #include "scalar.h"
+#include "group.h"
 
 
 // Populate vertices
@@ -58,7 +59,7 @@ public:
 
 protected:
   Axis dir;
-}
+};
 
 
 

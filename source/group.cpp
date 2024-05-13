@@ -143,7 +143,8 @@ SU2 SU2::crossProduct(const SU2& U){
   FloatType a = algebraNorm();
   FloatType a2 = U.algebraNorm();
 
-  Field alg2 = U.toAlgebra();
+  //Field alg2 = U.toAlgebra();
+  su2 alg2 = U.toAlgebra();
 
   std::vector<FloatType> algprime_array;
   algprime_array.push_back((alg[1]*alg2[2] - alg[2]*alg2[1]));

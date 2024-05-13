@@ -3,10 +3,15 @@
 #include "mpi.h"
 #include "precisions.h"
 #include "lattice.h"
+#include <cstring>
 
 // Indices of lattice vertices
 VertexIndex::VertexIndex(uint i, uint j, uint k){
     ind[0] = i % N; ind[1] = j % N; ind[2] = k % N;
+}
+
+VertexIndex::VertexIndex(const VertexIndex& vi){
+    ind[0] = vi.ind[0]; ind[1] = vi.ind[1]; ind[2] = vi.ind[2];
 }
 
 uint VertexIndex::getIndx() const {
@@ -56,20 +61,20 @@ VertexLattice::~VertexLattice(){
 }
 
 Vertex& VertexLattice::operator()(const VertexIndex& ind) {
-  return getSlice(ind.getIndx())[index.getIndyz()];
+  return getSlice(ind.getIndx())[ind.getIndyz()];
 }
 
 const Vertex& VertexLattice::operator()(const VertexIndex& ind) const {
-  return getSlice(ind.getIndx())[index.getIndyz()];
+  return getSlice(ind.getIndx())[ind.getIndyz()];
 }
 
 const VertexLattice& VertexLattice::operator=(const VertexLattice& vl){
   free();
   alloc();
-  memcpy(vertices, vl.vertices, (N/size + 2)*N*N*sizeof(Vertex));
+  std::memcpy(vertices, vl.vertices, (N/size + 2)*N*N*sizeof(Vertex));
 }
 
-static void VertexLattice::goToNext(VertexLattice& vl1, VertexLattice& vl2, VertexLattice& vl3){
+void VertexLattice::goToNext(VertexLattice& vl1, VertexLattice& vl2, VertexLattice& vl3){
   Vertex* temp = vl1.vertices;
   vl1.vertices = vl2.vertices;
   vl2.vertices = vl3.vertices;
@@ -95,11 +100,12 @@ void VertexLattice::send(int rankTo){
 void VertexLattice::receive(int rankFrom){
   // Receive last x slice of previous portion
   if (rankFrom == (rank-1 % size)){
-    MPI_Irecv(getSlice((rankFrom+1)*N/size - 1), N*N*sizeof(Vertex), MPI_BYTE, rankFrom, rankFrom, MPI_COMM_WORLD, &rightRec); // To be completed
+    MPI_Irecv(getSlice((rankFrom+1)*N/size - 1), N*N*sizeof(Vertex), MPI_BYTE, rankFrom, rankFrom, MPI_COMM_WORLD, &rightRec);
   }
   // Receive first x slice of next portion
   if (rankFrom == (rank+1 % size)){
-    MPI_Irecv(getSlice(rankFrom*N/size), N*N*sizeof(Vertex), MPI_BYTE, rankFrom, rankFrom, MPI_COMM_WORLD, &leftRec); // To be completed
+    MPI_Irecv(getSlice(rankFrom*N/size), N*N*sizeof(Vertex), MPI_BYTE, rankFrom, rankFrom, MPI_COMM_WORLD, &leftRec);
+  }
 }
 
 void VertexLattice::wait(){
@@ -115,7 +121,7 @@ void VertexLattice::wait(){
 
 // protected functions
 void VertexLattice::alloc(){
-  vertices = new Vertex[(N/size + 2)*N*N] // size is the number of MPI processes
+  vertices = new Vertex[(N/size + 2)*N*N]; // size is the number of MPI processes
 }
 
 void VertexLattice::free(){

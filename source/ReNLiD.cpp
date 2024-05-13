@@ -16,9 +16,12 @@ using namespace std::complex_literals;
 #include "lie.h"
 #include "scalar.h"
 #include "group.h"
+#include "lattice.h"
 
+#include "mpi.h"
 
-
+int rank;
+int size;
 
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////// Testing functions ///////////////////////////
@@ -166,8 +169,13 @@ void test_SU2(){
 
 
 
-int main(){
+int main(int argc, char **argv){
 
+  MPI_Init(&argc,&argv);
+  MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+  MPI_Comm_size(MPI_COMM_WORLD,&size);
+
+  printf("rank = %d, size = %d\n", rank, size);
 
   // printf("Real:\n");
   // test_phi();
@@ -186,9 +194,11 @@ int main(){
   // printf("U1 rep:\n");
   // test_U1();
 
-  printf("\nSU2 rep:\n");
-  test_SU2();
+  // printf("\nSU2 rep:\n");
+  // test_SU2();
 
+  MPI_Finalize();
+  
   return 0;
   
 }

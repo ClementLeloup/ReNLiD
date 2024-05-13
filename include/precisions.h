@@ -1,4 +1,7 @@
 // precisions.h
+
+#include "mpi.h"
+
 #ifndef _PRECISIONS_H_
 #define _PRECISIONS_H_
 
@@ -9,6 +12,8 @@ typedef unsigned int uint;
 // Spatial axes
 enum Axis{x, y, z};
 
-int N = 64;
+const int N = 64; // size of the box
+extern int size; // number of processes
+extern int rank;
 
 #endif
