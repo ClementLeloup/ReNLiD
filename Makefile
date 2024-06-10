@@ -7,7 +7,7 @@ WRKDIR = $(MDIR)/build
 	if ! [ -e $(WRKDIR) ]; then mkdir $(WRKDIR); fi;
 	touch build/.base
 
-vpath %.cpp source
+vpath %.cpp source:test
 vpath %.o build
 vpath .base build
 
@@ -16,7 +16,7 @@ vpath .base build
 CC	 = mpic++ -std=c++17
 
 # Additional libraries
-LBFLAG = -lstdc++ --lfftw3 -lm
+LBFLAG = -lstdc++ -lm -lfftw3
 
 # where to find include files *.h
 INCLUDES = -I../include
@@ -26,7 +26,11 @@ HEADERFILES = $(wildcard ./include/*.h)
 	cd $(WRKDIR);$(CC) $(LBFLAG) $(INCLUDES) -c ../$< -o $*.o
 
 
-SOURCE = field.o scalar.o vector.o lie.o group.o lattice.o
+SOURCE = field.o scalar.o vector.o lie.o group.o lattice.o timeslice.o
+
+TEST_FIELD = test_field.o
+
+TEST_TIMESLICE = test_timeslice.o
 
 MAIN = ReNLiD.o
 
@@ -34,6 +38,12 @@ all: ReNLiD
 
 ReNLiD: $(MAIN) $(SOURCE)
 	$(CC) -o ReNLiD $(addprefix build/,$(notdir $^)) $(LBFLAG)
+
+test_field: $(SOURCE) $(TEST_FIELD)
+	$(CC) -o $@ $(addprefix build/,$(notdir $^)) $(LBFLAG)
+
+test_timeslice: $(SOURCE) $(TEST_TIMESLICE)
+	$(CC) -o $@ $(addprefix build/,$(notdir $^)) $(LBFLAG)
 
 clean: .base
 	rm -rf $(WRKDIR);

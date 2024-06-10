@@ -5,6 +5,15 @@
 #include "lattice.h"
 #include <cstring>
 
+// Vertices
+RealScalar Vertex::getRealScalar(){
+  return phi;
+}
+
+void Vertex::setRealScalar(RealScalar psi){
+  phi = psi;
+}
+
 // Indices of lattice vertices
 VertexIndex::VertexIndex(uint i, uint j, uint k){
     ind[0] = i % N; ind[1] = j % N; ind[2] = k % N;
@@ -68,10 +77,11 @@ const Vertex& VertexLattice::operator()(const VertexIndex& ind) const {
   return getSlice(ind.getIndx())[ind.getIndyz()];
 }
 
-const VertexLattice& VertexLattice::operator=(const VertexLattice& vl){
+VertexLattice& VertexLattice::operator=(const VertexLattice& vl){
   free();
   alloc();
   std::memcpy(vertices, vl.vertices, (N/size + 2)*N*N*sizeof(Vertex));
+  return *this;
 }
 
 void VertexLattice::goToNext(VertexLattice& vl1, VertexLattice& vl2, VertexLattice& vl3){

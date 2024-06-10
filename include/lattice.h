@@ -9,13 +9,23 @@
 
 
 // Populate vertices
-class Vertex : public AdHiggs
+// class Vertex : public AdHiggs
+// {
+// public:
+//   Vertex() : AdHiggs(){}
+//   Vertex(const AdHiggs& h) : AdHiggs(h){}
+// };
+class Vertex// : public RealScalar
 {
 public:
-  Vertex() : AdHiggs(){}
-  Vertex(const AdHiggs& h) : AdHiggs(h){}
-};
+  Vertex(){RealScalar phi;}
+  Vertex(RealScalar psi){phi=psi;}
+  RealScalar getRealScalar();
+  void setRealScalar(RealScalar psi);
 
+protected:
+  RealScalar phi;
+};
 
 
 // Populate edges
@@ -73,7 +83,7 @@ public:
   ~VertexLattice();
   Vertex& operator()(const VertexIndex& ind); // get the vertex at index ind from the lattice
   const Vertex& operator()(const VertexIndex& ind) const;
-  const VertexLattice& operator=(const VertexLattice& vl);
+  VertexLattice& operator=(const VertexLattice& vl);
   static void goToNext(VertexLattice& vl1, VertexLattice& vl2, VertexLattice& vl3);
   void init();
 
@@ -104,7 +114,7 @@ public:
   Edge& operator()(const EdgeIndex& ind);
   const Edge& operator()(const EdgeIndex& ind) const;
   const Edge& operator()(const EdgeIndex& ind, Axis a) const;
-  const EdgeLattice& operator=(const EdgeLattice& el);
+  EdgeLattice& operator=(const EdgeLattice& el);
   static void goToNext(EdgeLattice& el1, EdgeLattice& el2, EdgeLattice& el3);
   void init();
 

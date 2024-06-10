@@ -12,18 +12,7 @@
 
 // Higgs field with fundamental representation
 // Constructors
-// FundHiggs::FundHiggs(std::complex<FloatType>* phi, int n){
-//   if(n!=2){
-//     throw std::invalid_argument("FundHiggs has the wrong size.");
-//   } else{
-//     field=std::vector<std::complex<FloatType>> (phi, phi+n);
-//     size=n;
-//   }
-// }
-
 FundHiggs::FundHiggs(std::vector<std::complex<FloatType>> phi){
-
-  
   if(phi.size()!=2){
     fprintf(stderr,"size is %ld\n", phi.size());
     throw std::invalid_argument("FundHiggs has the wrong size.");
@@ -47,19 +36,24 @@ FundHiggs FundHiggs::conj(){
 
 // Higgs field with adjoint representation
 //Constructors
-// AdHiggs::AdHiggs(FloatType* phi, int n){
-//   if(n!=3){
-//     throw std::invalid_argument("AdHiggs has the wrong size.");
-//   } else{
-//     field=phi;
-//     size=n;
-//   }
-// }
-
 AdHiggs::AdHiggs(std::vector<FloatType> phi){
   if(phi.size()!=3){
     fprintf(stderr,"size is %ld\n", phi.size());
     throw std::invalid_argument("AddHiggs has the wrong size.");
+  } else{
+    field=phi;
+    size=phi.size();
+  }
+}
+
+
+
+// Simple real scalar field
+//Constructors
+RealScalar::RealScalar(std::vector<FloatType> phi){
+  if(phi.size()!=1){
+    fprintf(stderr,"size is %ld\n", phi.size());
+    throw std::invalid_argument("RealScalar has the wrong size.");
   } else{
     field=phi;
     size=phi.size();

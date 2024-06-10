@@ -13,6 +13,7 @@ typedef unsigned int uint;
 enum Axis{x, y, z};
 
 const int N = 64; // size of the box
+const FloatType dt = 1.0; // time step, needs to be put in correct units
 extern int size; // number of processes
 extern int rank;
 

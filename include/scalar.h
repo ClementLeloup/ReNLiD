@@ -17,16 +17,12 @@ class FundHiggs : public Field<std::complex<FloatType>>, public OperationHelperF
 {
 public:
   // Constructors
-  // FundHiggs(std::complex<FloatType>* phi) : Field(phi, 2){}
-  // FundHiggs(std::complex<FloatType>* phi, int n);
   FundHiggs(std::vector<std::complex<FloatType>> phi);
   FundHiggs(){}
   
-  // Get conjugate of the field
-  FundHiggs conj();
+  FundHiggs conj(); // Get conjugate of the field
+  FloatType V(); // Get field potential
 };
-
-
 
 
 // Higgs field with adjoint representation
@@ -34,10 +30,22 @@ class AdHiggs : public Field<FloatType>, public OperationHelperField<AdHiggs,Flo
 {
 public:
   //Constructors
-  // AdHiggs(FloatType* phi) : Field(phi, 3){}
-  // AdHiggs(FloatType* phi, int n);
   AdHiggs(std::vector<FloatType> phi);
   AdHiggs(){}
+
+  FloatType V(); // Get field potential
+};
+
+
+// Simple real field
+class RealScalar : public Field<FloatType>, public OperationHelperField<RealScalar,FloatType>
+{
+public:
+  //Constructors
+  RealScalar(std::vector<FloatType> phi);
+  RealScalar(){}
+
+  FloatType V(); // Get field potential
 };
 
 
