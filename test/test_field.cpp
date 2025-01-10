@@ -1,4 +1,4 @@
-// ReNLiD.cpp
+// test_field.cpp
 
 #include <stdio.h>
 #include <iostream>
@@ -16,9 +16,6 @@ using namespace std::complex_literals;
 #include "lie.h"
 #include "scalar.h"
 #include "group.h"
-#include "lattice.h"
-
-#include "mpi.h"
 
 int rank;
 int size;
@@ -29,8 +26,6 @@ int size;
 
 void test_FundHiggs(){
 
-  // std::complex<FloatType> test_c[2] = {1.5+1.0i, 3.0+1.0i};
-  // std::complex<FloatType> test_c2[2] = {1.5+1.5i, 3.0+1.5i};
   std::vector<std::complex<FloatType>> test_c = {1.5+1.0i, 3.0+1.0i};
   std::vector<std::complex<FloatType>> test_c2 = {1.5+1.5i, 3.0+1.5i};
 
@@ -59,8 +54,6 @@ void test_FundHiggs(){
 
 void test_AdHiggs(){
 
-  // FloatType test_c[3] = {1.5, 3.0, 4.5};
-  // FloatType test_c2[3] = {1.0, 2.0, 3.0};
   std::vector<FloatType> test_c = {1.5, 3.0, 4.5};
   std::vector<FloatType> test_c2 = {1.0, 2.0, 3.0};
 
@@ -89,6 +82,38 @@ void test_AdHiggs(){
   std::cout << "Norm squared = " << higgs*higgs << "\t but also = " << higgs.normSquared() << "\n";
   std::cout << "Scalar product = " << higgs*higgs2 << "\n";
   
+};
+
+void test_RealScalar(){
+
+  std::vector<FloatType> test_c = {1.5};
+  std::vector<FloatType> test_c2 = {1.0};
+
+  printf("\nPhi:\n");
+  RealScalar phi(test_c);
+  phi.print();
+  printf("2 x phi =\n");
+  //phi = phi*2.0;
+  (phi*2.0).print();
+  phi.print();
+  
+  printf("\nPhi2:\n");
+  RealScalar phi2(test_c2);
+  phi2.print();
+  printf("phi2 / 2 =\n");
+  (phi2/2.0).print();
+  phi2.print();
+
+  printf("\nPhi + Phi2 =\n");
+  (phi+phi2).print();
+
+  // Scalar product
+  printf("Norm squared = %f \t but also = %f\n", phi*phi, phi.normSquared());
+  printf("Scalar product = %f\n", phi*phi2);
+
+  // Potential and potential derivative
+  printf("V(phi) = %f \t dV/dphi (phi) = %f \n", phi.V(), (phi.dVdphi())[0]);
+  printf("V(phi2) = %f \t dV/dphi (phi2) = %f \n", phi2.V(), (phi2.dVdphi())[0]);
   
 };
 
@@ -171,34 +196,23 @@ void test_SU2(){
 
 int main(int argc, char **argv){
 
-  MPI_Init(&argc,&argv);
-  MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-  MPI_Comm_size(MPI_COMM_WORLD,&size);
-
   printf("rank = %d, size = %d\n", rank, size);
 
-  // printf("Real:\n");
-  // test_phi();
+  printf("Fundamental Higgs:\n");
+  test_FundHiggs();
 
+  printf("\nAdjoint Higgs:\n");
+  test_AdHiggs();  
+
+  printf("\nReal Scalar:\n");
+  test_RealScalar();
   
-  // printf("\nComplex:\n");
-  // test_phic();
-
-  
-  // printf("Fundamental Higgs:\n");
-  // test_FundHiggs();
-
-  // printf("\nAdjoint Higgs:\n");
-  // test_AdHiggs();  
-
   // printf("U1 rep:\n");
   // test_U1();
 
   // printf("\nSU2 rep:\n");
   // test_SU2();
 
-  MPI_Finalize();
-  
   return 0;
   
 }

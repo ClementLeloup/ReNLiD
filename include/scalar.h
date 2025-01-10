@@ -12,16 +12,22 @@
 #include "precisions.h"
 #include "field.h"
 
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+
+
+
 // Higgs field with fundamental representation
 class FundHiggs : public Field<std::complex<FloatType>>, public OperationHelperField<FundHiggs,std::complex<FloatType>>
 {
 public:
   // Constructors
   FundHiggs(std::vector<std::complex<FloatType>> phi);
-  FundHiggs(){}
+  FundHiggs() : Field<std::complex<FloatType>>(2) {}
   
   FundHiggs conj(); // Get conjugate of the field
   FloatType V(); // Get field potential
+  FloatType dVdphi(); // Get potential derivative wrt field
 };
 
 
@@ -31,21 +37,32 @@ class AdHiggs : public Field<FloatType>, public OperationHelperField<AdHiggs,Flo
 public:
   //Constructors
   AdHiggs(std::vector<FloatType> phi);
-  AdHiggs(){}
+  AdHiggs() : Field<FloatType>(3) {}
 
   FloatType V(); // Get field potential
+  FloatType dVdphi(); // Get potential derivative wrt field
 };
 
 
 // Simple real field
 class RealScalar : public Field<FloatType>, public OperationHelperField<RealScalar,FloatType>
 {
+
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & field;
+    ar & fsize;
+  }
+  
 public:
   //Constructors
   RealScalar(std::vector<FloatType> phi);
-  RealScalar(){}
+  RealScalar() : Field<FloatType>(1) {}
 
   FloatType V(); // Get field potential
+  RealScalar dVdphi(); // Get potential derivative wrt field
 };
 
 

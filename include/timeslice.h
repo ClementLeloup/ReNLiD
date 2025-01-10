@@ -5,6 +5,8 @@
 
 #include "precisions.h"
 #include "lattice.h"
+#include "scalar.h"
+
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -18,17 +20,29 @@ class TimeSlice// : public VertexLattice
 public:
   TimeSlice();
   TimeSlice(const TimeSlice& ts);
+  TimeSlice(const Vertex* v, const Vertex* dv);
   ~TimeSlice();
-  Vertex& operator()(const VertexIndex& ind); // get the vertex at index ind from the lattice
-  // const Vertex& operator()(const VertexIndex& ind) const;
-  FloatType Energy();
-  FloatType Gauss();
+
+  // Return value of class members
+  Vertex* getField(); // get the vertex array
+  Vertex* getdField(); // get the dvertex array
+  void setField(const Vertex* v);
+  void setdField(const Vertex* dv);
+  Vertex getFieldAtInd(const VertexIndex& ind) const; // get the field at index ind from the time slice
+  Vertex getdFieldAtInd(const VertexIndex& ind) const; // get the field derivative wrt time at index ind from the time slice
+  FloatType getScaleFactor();
+
+  FloatType vev() const;
+  FloatType dvev() const;
+  FloatType Energy() const;
+  std::vector<FloatType> Average();
+  FloatType Gauss() const;
   std::vector<FloatType> PowerSpectrum(const std::vector<FloatType> k);
   void WhiteNoise();
   fftw_complex* aOperator(); // This operates in Fourier space
   // void init(const std::vector<FloatType> k, const std::vector<FloatType> sqrtPk);
-  void init(std::function<FloatType(FloatType)> sqrtPk);
-  void init(fftw_complex* ak, std::function<std::complex<FloatType>(FloatType)> uk, std::function<std::complex<FloatType>(FloatType)> duk);
+  void init(RealScalar phi, std::function<FloatType(FloatType)> sqrtPk);
+  void init(RealScalar phi, RealScalar dphi, fftw_complex* ak, std::function<std::complex<FloatType>(FloatType)> uk, std::function<std::complex<FloatType>(FloatType)> duk);
   void init(TimeSlice ts);
   void save(std::ofstream& outstream);
   

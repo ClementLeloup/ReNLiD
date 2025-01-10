@@ -7,6 +7,9 @@
 #include "scalar.h"
 #include "group.h"
 
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+namespace mpi = boost::mpi;
 
 // Populate vertices
 // class Vertex : public AdHiggs
@@ -17,12 +20,21 @@
 // };
 class Vertex// : public RealScalar
 {
+
+  friend class boost::serialization::access;
+  template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & phi;
+    }
+  
 public:
-  Vertex(){RealScalar phi;}
-  Vertex(RealScalar psi){phi=psi;}
+  Vertex(){}
+  Vertex(RealScalar psi) : phi(psi){}//{phi=psi;}
   RealScalar getRealScalar();
   void setRealScalar(RealScalar psi);
-
+  Vertex operator+(Vertex v);
+  
 protected:
   RealScalar phi;
 };
@@ -80,17 +92,19 @@ class VertexLattice
 public:
   VertexLattice();
   VertexLattice(const VertexLattice& vl);
+  VertexLattice(const Vertex* v);
   ~VertexLattice();
   Vertex& operator()(const VertexIndex& ind); // get the vertex at index ind from the lattice
   const Vertex& operator()(const VertexIndex& ind) const;
   VertexLattice& operator=(const VertexLattice& vl);
-  static void goToNext(VertexLattice& vl1, VertexLattice& vl2, VertexLattice& vl3);
   void init();
 
   // MPI communication processes
   void send(int rankTo);
   void receive(int rankFrom);
   void wait();
+
+  friend class Evolver;
   
 protected:
   void alloc();
@@ -99,7 +113,8 @@ protected:
   const Vertex* getSlice(uint ind0) const;
 
   Vertex* vertices;
-  MPI_Request leftSend, leftRec, rightSend, rightRec;
+  // MPI_Comm leftSend, leftRec, rightSend, rightRec;
+  mpi::request requests[4];
   
 };
 

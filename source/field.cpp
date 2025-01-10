@@ -18,13 +18,13 @@ const T& Field<T>::operator[](int i) const {
 
 template<class T>
 int Field<T>::getSize() const {
-  return size;
+  return fsize;
 }
 
 template<class T>
 FloatType Field<T>::normSquared() const {
   FloatType normsquared = 0;
-  for(int i=0; i<size; i++){
+  for(int i=0; i<fsize; i++){
     normsquared += pow(std::abs(field[i]), 2);
   }
   return normsquared;
@@ -37,9 +37,9 @@ FloatType Field<T>::norm() const {
   
 template<class T>
 void Field<T>::print(){
-  std::cout << "dimension = " << size << "\t";
+  std::cout << "dimension = " << fsize << "\t";
   std::cout << "field = ";
-  for(int i=0; i<size; i++){
+  for(int i=0; i<fsize; i++){
     std::cout << "   " << field[i];
   }
   std::cout << "\n";

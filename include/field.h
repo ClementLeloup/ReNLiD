@@ -103,6 +103,15 @@ struct OperationHelperField
     return scalarproduct;
   }
 
+  // S& operator=(const S& phi2){
+  //   S& reference = static_cast<S&>(*this);
+  //   int n = reference.getSize();
+  //   std::vector<T> copyfield;//(n);
+  //   for(int i=0; i<n; i++){
+  //     copyfield.push_back(phi2[i]);
+  //   }
+  //   return S(copyfield);
+  // }
   S operator+(const S& phi2){
     S& reference = static_cast<S&>(*this);
     int n = reference.getSize();
@@ -142,7 +151,8 @@ public:
   // Constructors
   // Field(T* phi, int n);
   // Field(T* phi, int n) : size(n), field(phi, phi+n){}
-  Field(std::vector<T> phi) : size(phi.size()), field(phi){}
+  Field(std::vector<T> phi) : fsize(phi.size()), field(phi) {}
+  Field(uint n) : fsize(n), field(n) {}
   Field(){}
 
   // Get element i of the field
@@ -161,7 +171,7 @@ public:
 
 protected:
   // Protected variables
-  int size;
+  int fsize;
   std::vector<T> field;
 
 };
