@@ -1,6 +1,5 @@
 // group.cpp
 
-// #include <math.h>
 #include <cmath>
 #include <complex>
 #include <vector>
@@ -12,38 +11,8 @@ using namespace std::complex_literals;
 #include "vector.h"
 
 
-// Representation of U(1) algebra
-// u1::u1(FloatType theta){
-//   FloatType field_theta[1] = {theta};
-//   field=field_theta;
-//   size=1;
-// }
 
-// u1::u1(FloatType theta){
-
-//   field.push_back(theta);
-//   size=1;
-
-// }
-
-// u1::u1(std::vector<FloatType> theta){
-//   if(theta.size()!=1){
-//     fprintf(stderr,"size is %ld\n", theta.size());    
-//     throw std::invalid_argument("FundHiggs has the wrong size.");
-//   } else{
-//     field=theta;
-//     size=theta.size();
-//   }
-// }
-
-
-// Representation of U(1) group
-// Act on real number
-// std::complex<FloatType> U1::act(const FloatType& a){
-//   return a*(cos(alg)+i*sin(alg));
-// }
-
-// Act on complex number
+// Action on complex number
 std::complex<FloatType> U1::action(const std::complex<FloatType>& a){
   return a*(cos(alg[0])+1.0i*sin(alg[0]));
 }
@@ -59,33 +28,6 @@ U1 U1::groupMultiply(const U1& U){
 
 
 
-// // Representation of SU(2) algebra
-// su2::su2(std::vector<FloatType> A){
-//   if(A.size()!=3){
-//     fprintf(stderr,"size is %ld\n", A.size());    
-//     throw std::invalid_argument("FundHiggs has the wrong size.");
-//   } else{
-//     field=A;
-//     size=A.size();
-//   }
-// }
-
-// Representation of SU(2) group
-
-//         (0 1)          (0 -i)          (1  0)
-// sig_1 = (1 0), sig_2 = (i  0), sig_3 = (0 -1)
-
-// // Constructors
-// SU2::SU2(Field A){
-
-//   if(A.getSize()!=3){
-//     throw std::invalid_argument("su(2) element has the wrong size.");
-//   } else{
-//     alg=A;
-//   }
-
-// }
-
 // Act on SU2 rep
 FundHiggs SU2::action(const FundHiggs& h){
 
@@ -100,50 +42,25 @@ FundHiggs SU2::action(const FundHiggs& h){
 // Act on SO3 rep
 AdHiggs SU2::action(const AdHiggs& h){
 
-  // printf("h0 = %f, h1 = %f, h2 = %f\n", h[0], h[1], h[2]);
-  // printf("alg0 = %f, alg1 = %f, alg2 = %f\n", alg[0], alg[1], alg[2]);
-  
   FloatType a = algebraNorm();
-  // printf("Norm = %f\n", a);
   std::complex<FloatType> alpha = cos(a) + 1.0i*sin(a)*alg[2]/a;
   std::complex<FloatType> beta = sin(a)*(alg[1] + 1.0i*alg[0])/a;
 
-  printf("alpha = %f + i%f\n", std::real(alpha), std::imag(alpha));
-  printf("beta = %f + i%f\n", std::real(beta), std::imag(beta));
-
-  // printf("      %f\t%f\t%f\n", std::imag(beta*beta-alpha*alpha), std::real(alpha*alpha + beta*beta), 2.0*std::imag(alpha*beta));
-  // printf("Phi = %f\t%f\t%f\n", std::real(beta*beta-alpha*alpha), std::imag(alpha*alpha + beta*beta), 2.0*std::real(alpha*beta));
-  // printf("      %f\t%f\t%f\n", 2.0*std::real(alpha*std::conj(beta)), - 2.0*imag(alpha*std::conj(beta)), (std::norm(alpha) - std::norm(beta)));
-
-  // FloatType hprime_array[3];
-  // hprime_array[0] = std::imag(beta*beta-alpha*alpha)*h[0] + std::real(alpha*alpha + beta*beta)*h[1] + 2.0*std::imag(alpha*beta)*h[2];
-  // hprime_array[1] = std::real(beta*beta-alpha*alpha)*h[0] + std::imag(alpha*alpha + beta*beta)*h[1] + 2.0*std::real(alpha*beta)*h[2];
-  // hprime_array[2] = 2.0*std::real(alpha*std::conj(beta))*h[0] - 2.0*imag(alpha*std::conj(beta))*h[1] + (std::norm(alpha) - std::norm(beta))*h[2];
-
-  // std::vector<FloatType> hprime_array;
-  // hprime_array.push_back(std::imag(beta*beta-alpha*alpha)*h[0] + std::real(alpha*alpha + beta*beta)*h[1] + 2.0*std::imag(alpha*beta)*h[2]);
-  // hprime_array.push_back(std::real(beta*beta-alpha*alpha)*h[0] + std::imag(alpha*alpha + beta*beta)*h[1] + 2.0*std::real(alpha*beta)*h[2]);
-  // hprime_array.push_back(2.0*std::real(alpha*std::conj(beta))*h[0] - 2.0*imag(alpha*std::conj(beta))*h[1] + (std::norm(alpha) - std::norm(beta))*h[2]);
-
+  // Adjoint action of the SU(2) group on 3-d Pauli vector
   std::vector<FloatType> hprime_array;
   hprime_array.push_back(std::real(alpha*alpha-beta*beta)*h[0] + std::imag(alpha*alpha + beta*beta)*h[1] - 2.0*std::real(alpha*beta)*h[2]);
   hprime_array.push_back(std::imag(beta*beta-alpha*alpha)*h[0] + std::real(alpha*alpha + beta*beta)*h[1] + 2.0*std::imag(alpha*beta)*h[2]);
   hprime_array.push_back(2.0*std::real(alpha*std::conj(beta))*h[0] + 2.0*imag(alpha*std::conj(beta))*h[1] + (std::norm(alpha) - std::norm(beta))*h[2]);
   
-  printf("h0 = %f, h1 = %f, h2 = %f\n", hprime_array[0], hprime_array[1], hprime_array[2]);
-
   return AdHiggs(hprime_array);
-  // return hprime_array;
   
 }
 
-
+// Group element corresponding to the cross product of su(2) algebra elements taken as Pauli vectors
 SU2 SU2::crossProduct(const SU2& U){
 
   FloatType a = algebraNorm();
   FloatType a2 = U.algebraNorm();
-
-  //Field alg2 = U.toAlgebra();
   su2 alg2 = U.toAlgebra();
 
   std::vector<FloatType> algprime_array;
@@ -159,31 +76,26 @@ SU2 SU2::inverse(){
   return SU2(-alg);
 }
 
+// SU(2) group multiplication expressed from its effect on su(2) elements
 SU2 SU2::groupMultiply(const SU2& U){
 
   FloatType a = algebraNorm();
   FloatType a2 = U.algebraNorm();
-
   su2 alg2 = U.toAlgebra();
-  
+
+  // Group multiplication from operations on algebra
   FloatType cosc = cos(a)*cos(a2) - (alg*alg2)*sin(a)*sin(a2)/(a*a2);
   su2 s = alg*sin(a)*cos(a2)/a + alg2*cos(a)*sin(a2)/a2 - (crossProduct(U).alg)*sin(a)*sin(a2)/(a*a2);
   FloatType snorm = s.norm();
 
   if(snorm!=0) s = s/snorm;
   
-  alg.print();
-  alg2.print();
-  // (alg*alg2).print();
-  s.print();
-  printf("tan(c) = %f, c = %f, a1.a2 = %f, |a1| = %f, |a2| = %f, cos(c) = %f and |s| = %f\n", snorm/cosc, atan2(snorm,cosc), alg*alg2, a, a2, cosc, snorm);
-  
-  return SU2(s*atan2(snorm,cosc));///snorm);
+  return SU2(s*atan2(snorm,cosc));
 
 }
 
+// Print the matrix representation of SU(2) elements
 void SU2::matrixForm(){
-
 
   FloatType a = algebraNorm();
   std::complex<FloatType> alpha = cos(a) + 1.0i*sin(a)*alg[2]/a;
@@ -193,7 +105,7 @@ void SU2::matrixForm(){
 
 }
 
-
+// Print the matrix representation of SU(2) elements, for comparison with groupMultiply
 void SU2::productMatrixForm(const SU2& U){
 
   FloatType a = algebraNorm();

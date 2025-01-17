@@ -15,7 +15,6 @@ class u1: public Field<FloatType>, public OperationHelperField<u1,FloatType>
 public:
   u1(FloatType theta);
   u1(std::vector<FloatType> theta);
-  // u1(FloatType* theta, int n);
   u1(){}
 };
 
@@ -25,7 +24,6 @@ class su2: public Field<FloatType>, public OperationHelperField<su2,FloatType>
 {
 public:
   su2(std::vector<FloatType> A);
-  // su2(FloatType* A, int n);  
   su2(){}
 };
 

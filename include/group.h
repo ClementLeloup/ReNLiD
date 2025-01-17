@@ -11,16 +11,6 @@
 #include "vector.h"
 #include "scalar.h"
 
-// // U(1) algebra representation
-// class u1: public Field<FloatType>, public OperationHelperField<u1,FloatType>
-// {
-// public:
-//   u1(FloatType theta);
-//   u1(std::vector<FloatType> theta);
-//   // u1(FloatType* theta, int n);
-//   u1(){}
-// };
-
 // U(1) group representation
 class U1 : public Lie<u1>
 {
@@ -31,21 +21,11 @@ public:
   U1(){}
 
   // Group multiplication
-  // std::complex<FloatType> act(const FloatType& a);
   std::complex<FloatType> action(const std::complex<FloatType>& a);
   U1 groupMultiply(const U1& U);
   U1 inverse();
 };
 
-
-// // SU(2) algebra representation
-// class su2: public Field<FloatType>, public OperationHelperField<su2,FloatType>
-// {
-// public:
-//   su2(std::vector<FloatType> A);
-//   // su2(FloatType* A, int n);  
-//   su2(){}
-// };
 
 // SU(2) group representation
 class SU2 : public Lie<su2>

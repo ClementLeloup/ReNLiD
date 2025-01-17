@@ -1,10 +1,5 @@
 // timeslice.cpp
 
-#include "precisions.h"
-#include "lattice.h"
-#include "timeslice.h"
-#include "scalar.h"
-
 #include <random>
 #include <complex.h>
 #include <fftw3.h>
@@ -14,6 +9,13 @@
 #include <iostream>
 #include <fstream>
 #include <functional>
+
+#include "precisions.h"
+#include "lattice.h"
+#include "timeslice.h"
+#include "scalar.h"
+
+
 
 // Store lattice information at constant time
 TimeSlice::TimeSlice(){  
@@ -113,15 +115,9 @@ FloatType TimeSlice::Energy() const {
 	VertexIndex ind(i1, i2, i3); 
 	RealScalar phi = getFieldAtInd(ind).getRealScalar();
 	RealScalar dphidt = getdFieldAtInd(ind).getRealScalar();
-	RealScalar dphidx = (phi - getFieldAtInd(ind-x).getRealScalar())/dx;
+	RealScalar dphidx = (phi - getFieldAtInd(ind-x).getRealScalar())/dx; // Taking left or right derivatives give similar results
 	RealScalar dphidy = (phi - getFieldAtInd(ind-y).getRealScalar())/dx;
 	RealScalar dphidz = (phi - getFieldAtInd(ind-z).getRealScalar())/dx;
-	// RealScalar dphidx = (getFieldAtInd(ind+x).getRealScalar() - phi)/dx;
-	// RealScalar dphidy = (getFieldAtInd(ind+y).getRealScalar() - phi)/dx;
-	// RealScalar dphidz = (getFieldAtInd(ind+z).getRealScalar() - phi)/dx;
-	// RealScalar dphidx = (getFieldAtInd(ind+x).getRealScalar() - getFieldAtInd(ind-x).getRealScalar())/(2.0*dx);
-	// RealScalar dphidy = (getFieldAtInd(ind+y).getRealScalar() - getFieldAtInd(ind-y).getRealScalar())/(2.0*dx);
-	// RealScalar dphidz = (getFieldAtInd(ind+z).getRealScalar() - getFieldAtInd(ind-z).getRealScalar())/(2.0*dx);
 	E += 0.5*(dphidt*dphidt + dphidx*dphidx + dphidy*dphidy + dphidz*dphidz) + phi.V();
       }
     }
@@ -131,27 +127,19 @@ FloatType TimeSlice::Energy() const {
   
 }
 
-// Compute total energy of the timeslice
+// Compute total energy, vev and dvev of the timeslice
 std::vector<FloatType> TimeSlice::Average() {
 
   std::vector<FloatType> avg(3, 0.0);
-// void TimeSlice::Average(std::vector<FloatType> &avg) {
-
   for(int i1=0; i1<N; i1++){
     for(int i2=0; i2<N; i2++){
       for(int i3=0; i3<N; i3++){
 	VertexIndex ind(i1, i2, i3); 
 	RealScalar phi = getFieldAtInd(ind).getRealScalar();
 	RealScalar dphidt = getdFieldAtInd(ind).getRealScalar();
-	RealScalar dphidx = (phi - getFieldAtInd(ind-x).getRealScalar())/dx;
+	RealScalar dphidx = (phi - getFieldAtInd(ind-x).getRealScalar())/dx; // Taking left or right derivatives give similar results
 	RealScalar dphidy = (phi - getFieldAtInd(ind-y).getRealScalar())/dx;
 	RealScalar dphidz = (phi - getFieldAtInd(ind-z).getRealScalar())/dx;
-	// RealScalar dphidx = (getFieldAtInd(ind+x).getRealScalar() - phi)/dx;
-	// RealScalar dphidy = (getFieldAtInd(ind+y).getRealScalar() - phi)/dx;
-	// RealScalar dphidz = (getFieldAtInd(ind+z).getRealScalar() - phi)/dx;
-	// RealScalar dphidx = (getFieldAtInd(ind+x).getRealScalar() - getFieldAtInd(ind-x).getRealScalar())/(2.0*dx);
-	// RealScalar dphidy = (getFieldAtInd(ind+y).getRealScalar() - getFieldAtInd(ind-y).getRealScalar())/(2.0*dx);
-	// RealScalar dphidz = (getFieldAtInd(ind+z).getRealScalar() - getFieldAtInd(ind-z).getRealScalar())/(2.0*dx);
 	avg[0] += 0.5*(dphidt*dphidt + dphidx*dphidx + dphidy*dphidy + dphidz*dphidz) + phi.V(); // energy
 	avg[1] += phi[0]; // inflaton
 	avg[2] += dphidt[0]; // dinflaton
@@ -169,17 +157,14 @@ std::vector<FloatType> TimeSlice::Average() {
 
 FloatType TimeSlice::Gauss() const {
 
-  // Need implementation when including vector bosons
+  // Need implementation when including gauge fields
   
   return 0.0;
   
 }
 
-// Now with complex fourier transform
+// Calculate powerspectrum of the field spatial distribution
 std::vector<FloatType> TimeSlice::PowerSpectrum(const std::vector<FloatType> k){
-
-  // FloatType machin;
-  // FloatType truc;
 
   FloatType phi0 = vev();
   fftw_complex *in, *out;
@@ -210,7 +195,6 @@ std::vector<FloatType> TimeSlice::PowerSpectrum(const std::vector<FloatType> k){
         FloatType k1 = (i1 <= N/2) ? i1 : i1-N;
 	FloatType k2 = (i2 <= N/2) ? i2 : i2-N;
 	FloatType k3 = (i3 <= N/2) ? i3 : i3-N;
-	// FloatType ki = std::sqrt(i1*i1 + i2*i2 + i3*i3);  // Get multipole
 	FloatType ki = 2.0*M_PI*std::sqrt(k1*k1 + k2*k2 + k3*k3)/(dx*scaleFactor*N);  // Get multipole
 	
 	uint kindex = 0;
@@ -218,17 +202,11 @@ std::vector<FloatType> TimeSlice::PowerSpectrum(const std::vector<FloatType> k){
 	// Search for interval where ki falls in k array
 	// Can be optimized
 	if(k[0] <= ki && ki <= k[k.size()-1]){
-	  // while(0.5*(k[kindex] + k[kindex+1]) <= ki && kindex < k.size()-1){ // k_size TBD
 	  while(kindex < k.size()-1 && k[kindex] + k[kindex+1] < 2.0*ki){ // k_size TBD
-	    // printf("Bon, on est au kindex = %d\n", kindex);
 	    kindex++;
 	  }
 	  density[kindex] += 1; // increment density count
-	  Pk[kindex] += (out[index][0]*out[index][0] + out[index][1]*out[index][1])/(N*N*N); // Check if no square root
-	  // machin = out[index][0];
-	  // truc = out[index][1];
-	  // printf("Re = %f \t Im = %f\n", machin, truc);
-	  // Pk[kindex] += machin*machin;
+	  Pk[kindex] += (out[index][0]*out[index][0] + out[index][1]*out[index][1])/(N*N*N);
 	}
 	
       }
@@ -238,7 +216,6 @@ std::vector<FloatType> TimeSlice::PowerSpectrum(const std::vector<FloatType> k){
   // Average over |k| shell
   for(int kindex=0; kindex < k.size(); kindex++){
     if(density[kindex] != 0){Pk[kindex] = Pk[kindex]/density[kindex];}
-    // Pk[kindex] = (density[kindex] != 0) ? Pk[kindex]/density[kindex] : 0;
   }
   
   fftw_destroy_plan(p);
@@ -249,6 +226,7 @@ std::vector<FloatType> TimeSlice::PowerSpectrum(const std::vector<FloatType> k){
   
 }
 
+// Populate the time slice with a white noise realization
 void TimeSlice::WhiteNoise(){
   
   std::default_random_engine generator;
@@ -262,15 +240,17 @@ void TimeSlice::WhiteNoise(){
   
 }
 
-// Be careful, this operates in Fourier space
+// Random creation and annihilation fields, easier to generate the right initial conditions for the fields and their derivatives
 fftw_complex* TimeSlice::aOperator(){
 
+  // Be careful, this operates in Fourier space
   fftw_complex *ak;
   ak = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N*N*N); // random realization for the stochastic analog of the annihilation operator
   
   std::default_random_engine generator;
   std::uniform_real_distribution<FloatType> distribution(0.0,1.0);
 
+  // Generate a random realization of creation and annihilation fields
   for (int k=0; k<N*N*N; ++k) {
     FloatType Xk = distribution(generator);
     FloatType Yk = distribution(generator);
@@ -283,6 +263,7 @@ fftw_complex* TimeSlice::aOperator(){
   
 }
 
+// Initialize the initial condition to a random realization with correct statistical properties, from the field powerspectrum square root
 void TimeSlice::init(RealScalar phi, std::function<FloatType(FloatType)> sqrtPk){
 
   WhiteNoise();
@@ -380,7 +361,6 @@ void TimeSlice::init(RealScalar phi, RealScalar dphi, fftw_complex* ak, std::fun
   for(int i=0; i<N*N*N;i++){
     std::vector<FloatType> psi(1, out[i][0]/std::sqrt(N*N*N));
     std::vector<FloatType> dpsi(1, dout[i][0]/std::sqrt(N*N*N));
-    // printf("Avg: %f \t Pert: %f\n", dphi[0], dpsi[0]);
     vertices[i].setRealScalar(phi+RealScalar(psi));
     dvertices[i].setRealScalar(dphi+RealScalar(dpsi));
   }

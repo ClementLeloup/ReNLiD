@@ -1,17 +1,17 @@
 // evolver.cpp
 
 #include <cstdlib>
-#include <boost/mpi.hpp>
 #include <string>
+#include <boost/mpi.hpp>
 #include <boost/serialization/vector.hpp>
 namespace mpi = boost::mpi;
-// #include "mpi.h"
 
 #include "precisions.h"
 #include "scalar.h"
 #include "lattice.h"
 #include "timeslice.h"
 #include "evolver.h"
+
 
 
 Evolver::Evolver(){
@@ -60,17 +60,13 @@ void Evolver::setAverage(const FloatType E, const FloatType phi, const FloatType
 void Evolver::setAverage(TimeSlice ts){
 
   std::vector<FloatType> avg = ts.Average();
-  // std::vector<FloatType> avg(3, 0.0);
-  // ts.Average(avg);
   energy = avg[0];
   inflaton = avg[1];
   dinflaton = avg[2];
-  // energy = ts.Energy();
-  // inflaton = ts.vev();
-  // dinflaton = ts.dvev();
+
 }
 
-// Gather distributed lattice into single time slice
+// Gather distributed lattice at given time into single time slice
 TimeSlice Evolver::LatticeToTimeSlice(){
 
   Vertex* vertices;
@@ -84,6 +80,8 @@ TimeSlice Evolver::LatticeToTimeSlice(){
     dvertices = new Vertex[N*N*N/size];
   }
 
+  // Construct field and field derivative arrays to populate the time slice
+  // To be extended to other fields
   for(int i1=0; i1<N/size; i1++){
     for(int i2=0; i2<N; i2++){
       for(int i3=0; i3<N; i3++){
@@ -106,6 +104,7 @@ TimeSlice Evolver::LatticeToTimeSlice(){
   }
 
 
+  // Create and populate the time slice
   TimeSlice ts;
   if(rank == 0){
     ts.setField(vertices);
@@ -126,7 +125,11 @@ void Evolver::TimeSliceToLattice(const TimeSlice& ts, const uint s){
 
   step = s;
   energy = ts.Energy();
+  inflaton = ts.vev();
+  dinflaton = ts.dvev();
 
+  // Construct lattice state at two times from fields and field derivatives in time slice
+  // To be extended to other fields
   for(int i1=rank*N/size-1; i1<(rank+1)*N/size+1; i1++){
     for(int i2=0; i2<N; i2++){
       for(int i3=0; i3<N; i3++){
@@ -150,10 +153,7 @@ void Evolver::evolveSlice(uint i1){
       RealScalar phi1 = v1(ind).getRealScalar();
       RealScalar phi2 = v2(ind).getRealScalar()*2.0;
 
-      // RealScalar d2phidx2 = v2(ind+x).getRealScalar() + v2(ind-x).getRealScalar() - phi2;
-      // RealScalar d2phidy2 = v2(ind+y).getRealScalar() + v2(ind-y).getRealScalar() - phi2;
-      // RealScalar d2phidz2 = v2(ind+z).getRealScalar() + v2(ind-z).getRealScalar() - phi2;
-      
+      // To be extended to other fields
       // v3(ind).setRealScalar(phi2 - phi1 + ((d2phidx2 + d2phidy2 + d2phidz2)/(dx*dx) - (phi2*0.5).dVdphi())*dtau*dtau);
       v3(ind).setRealScalar(phi2 - phi1 + ((v2(ind+x).getRealScalar() + v2(ind-x).getRealScalar()
 					    + v2(ind+y).getRealScalar() + v2(ind-y).getRealScalar()
@@ -167,35 +167,9 @@ void Evolver::evolveSlice(uint i1){
 }
 
 
+// Manage computation and MPI communication needed to go to next time step
 void Evolver::evolveLattice(){
 
-  // Evolve all slices
-  // for(int i1=rank*N/size; i1<(rank+1)*N/size; i1++){
-  //   evolveSlice(i1);
-  // }
-
-
-  // if(size != 1){
-  //   for(int r = 0; r<size; r++){
-  //     int rankLeft = (size + r - 1) % size;
-  //     if(rank == r){
-  // 	v3.send(rankLeft); // send to previous process
-  //     } else if (rank == rankLeft){
-  // 	v3.receive(r); // receive from previous process
-  //     }
-  //   }
-
-  //   for(int r = 0; r<size; r++){
-  //     int rankRight = (r + 1) % size;
-  //     if(rank == r){
-  // 	v3.send(rankRight); // send to previous process
-  //     } else if (rank == rankRight){
-  // 	v3.receive(r); // receive from previous process
-  //     }
-  //   }
-    
-  // }
-  
   int rankLeft = (size + rank - 1) % size;
   int rankRight = (rank + 1) % size;
   
@@ -212,24 +186,12 @@ void Evolver::evolveLattice(){
   }
   v3.wait();
   
-  // for(int i1=rank*N/size-1; i1<(rank+1)*N/size+1; i1++){
-  //   for(int i2=0; i2<N; i2++){
-  //     for(int i3=0; i3<N; i3++){
-  // 	int i1_pos = (N + i1) % N;
-  // 	VertexIndex ind(i1_pos,i2,i3);
-  // 	printf("Element in pos (%d,%d,%d) of v1 in rank %d is %f\n", i1, i2, i3, rank, v1(ind).getRealScalar()[0]);
-  // 	printf("Element in pos (%d,%d,%d) of v2 in rank %d is %f\n", i1, i2, i3, rank, v2(ind).getRealScalar()[0]);
-  // 	printf("Element in pos (%d,%d,%d) of v3 in rank %d is %f\n", i1, i2, i3, rank, v3(ind).getRealScalar()[0]);
-  //     }
-  //   }
-  // }
-  
   /// Need to evolve the EdgeLattice ///
   
 }
 
 
-// Roll over three slices to evolve in time
+// Roll over three slices to evolve in time with minimal storage need
 int Evolver::goToNext(){
   
   Vertex* temp = v1.vertices;
@@ -246,12 +208,6 @@ int Evolver::goToNext(){
     // save();
     TimeSlice ts = LatticeToTimeSlice();
     if(rank == 0){
-      // printf("Step %d energy = %f\n", step, ts.Energy());
-      // energy = ts.Energy();
-      // inflaton = ts.vev();
-      // printf("The vev of phi at step %d is %f", step, ts.vev()[0]);
-      // if((ts.Energy()/energy - 1 > energy_precision ) || (std::abs(ts.Gauss()) > gauss_precision)){return EXIT_FAILURE;}
-      // setAverage(ts);
       setAverage(ts.Energy(), ts.vev(), ts.dvev());
     }
     // Need to communicate the status to other MPI processes
@@ -263,9 +219,6 @@ int Evolver::goToNext(){
 
 void Evolver::save(){
 
+  // Need implementation
 
 }
-
-
-// void Evolver::commRight(VertexLattice &v, int rankTo, int rankFrom){
-// }

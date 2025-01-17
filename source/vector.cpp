@@ -6,6 +6,9 @@
 #include "scalar.h"
 #include "vector.h"
 
+
+
+
 // Representation of U(1) algebra
 u1::u1(FloatType theta){
 
@@ -23,7 +26,6 @@ u1::u1(std::vector<FloatType> theta){
     size=theta.size();
   }
 }
-
 
 
 

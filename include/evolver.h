@@ -29,10 +29,6 @@ public:
   int goToNext();
   void save();
 
-  // MPI communication processes
-  // void commRight(VertexLattice &v, int rankTo, int rankFrom);
-
-  
 protected:
   uint step;
   FloatType inflaton; // vev of the inflaton field

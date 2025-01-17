@@ -3,17 +3,14 @@
 #ifndef _SCALAR_H_
 #define _SCALAR_H_
 
-//#include <cmath>
 #include <complex>
 #include <vector>
-//#include <iomanip>
-// using namespace std::complex_literals;
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 
 #include "precisions.h"
 #include "field.h"
 
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
 
 
 

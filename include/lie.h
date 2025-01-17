@@ -3,14 +3,13 @@
 #ifndef _LIE_H_
 #define _LIE_H_
 
+#include <vector>
 
 #include "field.h"
 #include "precisions.h"
 
-#include <vector>
-
 // Class of Lie group representation
-// It is used to define the links
+// It is used to define the edges
 template<class T>
 class Lie
 {

@@ -1,9 +1,12 @@
 // field.cpp
 
-#include "field.h"
-#include "precisions.h"
 #include <complex>
 #include <vector>
+
+#include "field.h"
+#include "precisions.h"
+
+
 
 // Get element i of the field
 template<class T>

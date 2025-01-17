@@ -1,6 +1,5 @@
 // lie.cpp
-// #include <functional>
-// #include <iostream>
+
 #include <assert.h>
 using namespace std;
 
@@ -10,23 +9,6 @@ using namespace std;
 #include "scalar.h"
 #include "vector.h"
 
-
-// // Constructors
-// template<class T>
-// Lie<T>::Lie(T A){
-//   alg = A;
-// }
-
-// template<class T>
-// Lie<T>::Lie(std::vector<FloatType> A){
-//   alg = T(A);
-// }
-
-
-// Member functions
-// Field<FloatType> Lie::toAlgebra(){
-//   return alg;
-// }
 
 template<class T>
 T Lie<T>::toAlgebra() const {
@@ -38,15 +20,16 @@ FloatType Lie<T>::algebraNorm() const {
   return alg.norm();
 }
 
+// To be cleaned
 template<class T>
 Lie<T>& Lie<T>::inverse(){
 
   assert(1==0); // group multiplication should be implemented at the child class level
   
-  // return Lie(-alg);
   return (*this);
 }
 
+// To be cleaned
 template<class T>
 Lie<T>& Lie<T>::groupMultiply(const Lie<T>& U){
 

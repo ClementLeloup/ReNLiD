@@ -4,7 +4,6 @@
 #include <complex>
 #include <iomanip>
 #include <vector>
-// using namespace std::complex_literals;
 
 #include "precisions.h"
 #include "scalar.h"
@@ -24,10 +23,9 @@ FundHiggs::FundHiggs(std::vector<std::complex<FloatType>> phi){
 
 // Get conjugate of the field
 FundHiggs FundHiggs::conj(){
-  std::vector<std::complex<FloatType>> conjfield;//(size);// = new std::complex<FloatType>[size];
+  std::vector<std::complex<FloatType>> conjfield;
   for(int i=0; i<fsize; i++){
-    // conjfield[i] = std::conj(field[i]);
-    conjfield.push_back(field[i]);
+    conjfield.push_back(std::conj(field[i]));
   }
   return FundHiggs(conjfield);
 }
@@ -62,13 +60,13 @@ RealScalar::RealScalar(std::vector<FloatType> phi){
 //Potential
 FloatType RealScalar::V(){
   RealScalar phi = (*this);
-  return 0.25*(phi*phi)*(phi*phi);// (this*this)*(this*this);
+  return 0.25*(phi*phi)*(phi*phi);
   // return lamb*(phi*phi)*(phi*phi);
 }
 
 //Potential derivative
 RealScalar RealScalar::dVdphi(){
   RealScalar phi = (*this);  
-  return phi*(phi*phi); // this*(this*this);
+  return phi*(phi*phi);
   // return phi*4.0*lamb*(phi*phi);
 }

@@ -3,10 +3,6 @@
 #ifndef _TIMESLICE_H_
 #define _TIMESLICE_H_
 
-#include "precisions.h"
-#include "lattice.h"
-#include "scalar.h"
-
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -14,8 +10,13 @@
 #include <complex>
 #include <fftw3.h>
 
-// Store lattice information at constant time
-class TimeSlice// : public VertexLattice
+#include "precisions.h"
+#include "lattice.h"
+#include "scalar.h"
+
+
+// Stores lattice information at a given time
+class TimeSlice
 {
 public:
   TimeSlice();
@@ -40,7 +41,6 @@ public:
   std::vector<FloatType> PowerSpectrum(const std::vector<FloatType> k);
   void WhiteNoise();
   fftw_complex* aOperator(); // This operates in Fourier space
-  // void init(const std::vector<FloatType> k, const std::vector<FloatType> sqrtPk);
   void init(RealScalar phi, std::function<FloatType(FloatType)> sqrtPk);
   void init(RealScalar phi, RealScalar dphi, fftw_complex* ak, std::function<std::complex<FloatType>(FloatType)> uk, std::function<std::complex<FloatType>(FloatType)> duk);
   void init(TimeSlice ts);

@@ -1,8 +1,7 @@
 // field.h 
+
 #ifndef _FIELD_H_
 #define _FIELD_H_
-
-#include "precisions.h"
 
 #include <stdio.h>
 #include <iostream>
@@ -12,8 +11,10 @@
 #include <complex>
 #include <iomanip>
 
+#include "precisions.h"
 
-// Class to propagate basic operations to all field child classes
+
+// Class to propagate basic operations to all field child classes using curiously recurring template pattern (CRTP)
 template<class S, class T>
 struct OperationHelperField
 {
@@ -103,15 +104,6 @@ struct OperationHelperField
     return scalarproduct;
   }
 
-  // S& operator=(const S& phi2){
-  //   S& reference = static_cast<S&>(*this);
-  //   int n = reference.getSize();
-  //   std::vector<T> copyfield;//(n);
-  //   for(int i=0; i<n; i++){
-  //     copyfield.push_back(phi2[i]);
-  //   }
-  //   return S(copyfield);
-  // }
   S operator+(const S& phi2){
     S& reference = static_cast<S&>(*this);
     int n = reference.getSize();
@@ -143,14 +135,12 @@ struct OperationHelperField
 };
 
 
-// Class of fields
+// Class of general fields (members of a vector space with scalar product)
 template <class T>
 class Field
 {
 public:  
   // Constructors
-  // Field(T* phi, int n);
-  // Field(T* phi, int n) : size(n), field(phi, phi+n){}
   Field(std::vector<T> phi) : fsize(phi.size()), field(phi) {}
   Field(uint n) : fsize(n), field(n) {}
   Field(){}
@@ -162,7 +152,7 @@ public:
   // Get dimension
   int getSize() const;
 
-  // Compute norm of field
+  // Compute norm of field from scalar product
   FloatType normSquared() const;
   FloatType norm() const;
 

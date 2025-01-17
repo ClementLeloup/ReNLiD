@@ -3,22 +3,18 @@
 #ifndef _LATTICE_H_
 #define _LATTICE_H_
 
-#include "precisions.h"
-#include "scalar.h"
-#include "group.h"
-
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 namespace mpi = boost::mpi;
 
-// Populate vertices
-// class Vertex : public AdHiggs
-// {
-// public:
-//   Vertex() : AdHiggs(){}
-//   Vertex(const AdHiggs& h) : AdHiggs(h){}
-// };
-class Vertex// : public RealScalar
+#include "precisions.h"
+#include "scalar.h"
+#include "group.h"
+
+
+
+
+class Vertex // To be modified to include multiple fields, and multi-dimensional fields
 {
 
   friend class boost::serialization::access;
@@ -113,7 +109,6 @@ protected:
   const Vertex* getSlice(uint ind0) const;
 
   Vertex* vertices;
-  // MPI_Comm leftSend, leftRec, rightSend, rightRec;
   mpi::request requests[4];
   
 };
@@ -146,12 +141,6 @@ protected:
   
   Edge* edges;
 };
-
-
-
-
-
-
 
 
 

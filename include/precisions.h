@@ -1,7 +1,6 @@
 // precisions.h
 
 #include <math.h>
-// #include "mpi.h"
 #include <boost/mpi.hpp>
 namespace mpi = boost::mpi;
 
@@ -17,10 +16,10 @@ enum Axis{x, y, z};
 
 const int N = 64; // size of the box
 const FloatType L = 16.0*M_PI;
-const FloatType dtau = 0.005; // time step, needs to be put in correct units
-const FloatType dtau_bg = 0.01; // time step for background calculation
-const FloatType dx = L/N; // lattice physical step size, needs to be put in correct units
-const FloatType lamb = 0.0001; // higgs self-interaction
+const FloatType dtau = 0.005; // time step for the lattice evolution
+const FloatType dtau_bg = 0.001; // time step for the background calculation
+const FloatType dx = L/N; // lattice physical step size
+const FloatType lamb = 0.0001; // scalar self-coupling
 
 extern mpi::communicator world;
 extern int size; // number of processes
